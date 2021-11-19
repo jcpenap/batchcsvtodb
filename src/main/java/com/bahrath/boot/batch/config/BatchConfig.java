@@ -32,6 +32,7 @@ public class BatchConfig {
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
+    @Bean
     public Job job() {
         return jobBuilderFactory.get("job-2")
                 .incrementer(new RunIdIncrementer())
@@ -63,6 +64,8 @@ public class BatchConfig {
         lineMapper.setLineTokenizer(lineTokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
 
+        reader.setLineMapper(lineMapper);
+
         return reader;
     }
 
@@ -79,7 +82,7 @@ public class BatchConfig {
         JdbcBatchItemWriter<Product> writer = new JdbcBatchItemWriter<>();
         writer.setDataSource(dataSource());
         writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Product>());
-        writer.setSql("INSERT INTO PRODUCT (ID, NAME, DESCRIPTION, PRICE) VALUES (:id, :name, :description, :price)");
+        writer.setSql("insert into mydb.product (id, name, description, price) values (:id, :name, :description, :price)");
         return writer;
     }
 
