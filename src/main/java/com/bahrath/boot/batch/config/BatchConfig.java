@@ -13,6 +13,9 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class BatchConfig {
@@ -43,11 +46,23 @@ public class BatchConfig {
         };
     }
 
+    @Bean
     public ItemWriter<Product> writer() {
         JdbcBatchItemWriter<Product> writer = new JdbcBatchItemWriter<>();
+        writer.setDataSource(dataSource());
         writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Product>());
         writer.setSql("INSERT INTO PRODUCT (ID, NAME, DESCRIPTION, PRICE) VALUES (:id, :name, :description, :price)");
         return writer;
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/mydb");
+        dataSource.setUsername("admin");
+        dataSource.setPassword("admin");
+        return dataSource;
     }
 
 }
